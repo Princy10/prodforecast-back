@@ -1,9 +1,6 @@
-package mg.extedim.prodforecastback.model;
+package mg.extedim.prodforecastback.model.postgres;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,16 +9,20 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.UUID;
 
 @Entity
-@Table(name = "dossiers")
+@Table(name = "etapes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Dossier {
+public class Etape {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
     private String nom;
-    private Integer priorite;
+
+    @ManyToOne
+    @JoinColumn(name = "dossier_id", nullable = false)
+    private Dossier dossier;
 }
+

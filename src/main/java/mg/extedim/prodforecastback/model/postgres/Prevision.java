@@ -1,4 +1,4 @@
-package mg.extedim.prodforecastback.model;
+package mg.extedim.prodforecastback.model.postgres;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,19 +7,23 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "productions")
+@Table(name = "previsions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Production {
+public class Prevision {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
+
+    private LocalDate date;
+    private String typePrevision; // JOUR, SEMAINE, MOIS
+    private Integer valeurPrevue;
+    private Integer valeurReelle;
 
     @ManyToOne
     @JoinColumn(name = "dossier_id", nullable = false)
@@ -28,18 +32,4 @@ public class Production {
     @ManyToOne
     @JoinColumn(name = "etape_id", nullable = false)
     private Etape etape;
-
-    @ManyToOne
-    @JoinColumn(name = "operateur_id", nullable = false)
-    private User operateur;
-
-    private LocalDate dateSaisie;
-    private LocalTime heureDebut;
-    private LocalTime heureFin;
-    private Integer nbEnregistrements;
-    private Integer dureeNette;
-    private Integer dureePause;
-    private String poste;
-    private String typeDossier;
 }
-

@@ -1,4 +1,4 @@
-package mg.extedim.prodforecastback.model;
+package mg.extedim.prodforecastback.model.postgres;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,20 +9,16 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.UUID;
 
 @Entity
-@Table(name = "etapes")
+@Table(name = "roles")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Etape {
+public class Role {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    private String nom;
-
-    @ManyToOne
-    @JoinColumn(name = "dossier_id", nullable = false)
-    private Dossier dossier;
+    @Column(nullable = false, unique = true)
+    private String nom; // ADMIN, MANAGER, CHEF_GROUPE
 }
-
