@@ -9,10 +9,12 @@ import mg.extedim.prodforecastback.model.Role;
 import mg.extedim.prodforecastback.model.User;
 import mg.extedim.prodforecastback.repository.RoleRepository;
 import mg.extedim.prodforecastback.repository.UserRepository;
+import mg.extedim.prodforecastback.security.jwt.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +23,13 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final JwtService jwtService;
+
     public AuthResponse register(RegisterRequest request) {
-        // Vérifie si l'email existe déjà
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyUsedException("Cet email est déjà utilisé.");
         }
 
-        // Vérifie que le rôle demandé existe
         Role role = roleRepository.findByNom(request.getRoleName())
                 .orElseThrow(() -> new RoleNotFoundException("Rôle non trouvé : " + request.getRoleName()));
 
@@ -42,11 +44,11 @@ public class AuthService {
         user.setCreatedAt(LocalDateTime.now());
         userRepository.save(user);
 
-        return new AuthResponse(null, "Utilisateur créé avec succès");
+        String token = jwtService.generateToken(Map.of("role", role.getNom().name()), user.getEmail());
+        return new AuthResponse(token, "Bearer");
     }
 
     public AuthResponse login(LoginRequest request) {
-        // Recherche l'utilisateur par email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Aucun utilisateur trouvé avec cet email"));
 
@@ -58,6 +60,7 @@ public class AuthService {
             throw new InvalidPasswordException("Mot de passe incorrect");
         }
 
-        return new AuthResponse(null, "Authentification réussie");
+        String token = jwtService.generateToken(Map.of("role", user.getRole().getNom().name()), user.getEmail());
+        return new AuthResponse(token, "Bearer");
     }
 }
