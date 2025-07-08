@@ -1,6 +1,6 @@
-package mg.extedim.prodforecastback.repository.postgres;
+package mg.extedim.prodforecastback.repository;
 
-import mg.extedim.prodforecastback.model.postgres.Dossier;
+import mg.extedim.prodforecastback.model.Dossier;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package mg.extedim.prodforecastback.model.postgres;
+package mg.extedim.prodforecastback.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
