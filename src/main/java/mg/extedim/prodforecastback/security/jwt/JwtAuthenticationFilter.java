@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import mg.extedim.prodforecastback.model.User;
 import mg.extedim.prodforecastback.repository.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -45,12 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             User user = userRepository.findByEmail(userEmail).orElse(null);
 
             if (user != null && jwtService.validateToken(jwt)) {
-                // Ici, tu pourrais aussi charger les rôles depuis le JWT et les mettre dans authorities
+                String role = jwtService.getRoleFromToken(jwt);
+                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                user, // Principal
+                                user,
                                 null,
-                                Collections.emptyList() // Mets ici les authorities si tu veux gérer les rôles plus tard
+                                authorities
                         );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

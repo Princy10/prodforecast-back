@@ -44,8 +44,7 @@ public class AuthService {
         user.setCreatedAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String token = jwtService.generateToken(Map.of("role", role.getNom().name()), user.getEmail());
-        return new AuthResponse(token, "Bearer");
+        return new AuthResponse(null, "Utilisateur créé avec succès");
     }
 
     public AuthResponse login(LoginRequest request) {
