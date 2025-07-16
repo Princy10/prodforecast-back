@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mg.extedim.prodforecastback.dto.AuthResponse;
 import mg.extedim.prodforecastback.dto.LoginRequest;
 import mg.extedim.prodforecastback.dto.RegisterRequest;
+import mg.extedim.prodforecastback.dto.UserInfoDto;
 import mg.extedim.prodforecastback.exception.*;
 import mg.extedim.prodforecastback.model.Role;
 import mg.extedim.prodforecastback.model.User;
@@ -22,7 +23,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final JwtService jwtService;
 
     public AuthResponse register(RegisterRequest request) {
@@ -33,7 +33,6 @@ public class AuthService {
         Role role = roleRepository.findByNom(request.getRoleName())
                 .orElseThrow(() -> new RoleNotFoundException("Rôle non trouvé : " + request.getRoleName()));
 
-        // Création et sauvegarde du nouvel utilisateur
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -44,7 +43,7 @@ public class AuthService {
         user.setCreatedAt(LocalDateTime.now());
         userRepository.save(user);
 
-        return new AuthResponse(null, "Utilisateur créé avec succès");
+        return new AuthResponse(null, "Utilisateur créé avec succès", null, null);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -60,6 +59,17 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(Map.of("role", user.getRole().getNom().name()), user.getEmail());
-        return new AuthResponse(token, "Bearer");
+        Long expireAt = jwtService.extractExpiration(token);
+
+        UserInfoDto userInfoDto = new UserInfoDto(
+                user.getId(),
+                user.getEmail(),
+                user.getNom(),
+                user.getPrenom(),
+                user.getRole().getNom().name(),
+                user.getPhotoUrl()
+        );
+
+        return new AuthResponse(token, "Bearer", expireAt, userInfoDto);
     }
 }

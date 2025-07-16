@@ -8,4 +8,6 @@ import lombok.Data;
 public class AuthResponse {
     private String accessToken;
     private String tokenType;
+    private Long expireAt;
+    private UserInfoDto user;
 }

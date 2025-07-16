@@ -51,4 +51,9 @@ public class JwtService {
             return false;
         }
     }
+
+    public long extractExpiration(String token) {
+        return getAllClaimsFromToken(token).getExpiration().getTime();
+    }
+
 }
